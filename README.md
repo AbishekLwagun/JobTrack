@@ -1,101 +1,135 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
-<img width="432" height="935" alt="image" src="https://github.com/user-attachments/assets/2367c0b2-13f0-412c-854c-0e3fc1931306" />
-<img width="432" height="930" alt="image" src="https://github.com/user-attachments/assets/4d7166ca-b1fc-46d6-b61f-e73ceddcf23d" />
-<img width="441" height="922" alt="image" src="https://github.com/user-attachments/assets/1fb20a13-318c-42bd-8980-afaba21b625d" />
-<img width="430" height="907" alt="image" src="https://github.com/user-attachments/assets/67eeb7a8-d3a9-4390-9a8c-3f6accff8e15" />
+# 📱 JobTrack
 
-# Getting Started
+> A React Native mobile application for managing and tracking software engineering job applications.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+JobTrack is a personal job application command center designed to make it easier to track applications, monitor their progress, and keep important job information organized in one place.
 
-## Step 1: Start Metro
+The project is being developed as a real-world software engineering project, with the goal of progressing from a mobile application into a complete full-stack system.
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+---
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## 📸 Preview
 
-```sh
-# Using npm
-npm start
+<!-- Add screenshots here -->
 
-# OR using Yarn
-yarn start
+<p align="center">
+  <img src="docs/images/home.png" width="250" alt="JobTrack Home Screen">
+  <img src="docs/images/job-details.png" width="250" alt="Job Details Screen">
+  <img src="docs/images/add-job.png" width="250" alt="Add Application Screen">
+</p>
+
+> Screenshots will be updated as the application evolves.
+
+---
+
+## ✨ Current Features
+
+### 📊 Dashboard
+
+The home screen provides an overview of tracked applications, including application statistics and job cards.
+
+### ➕ Add Applications
+
+Create a new job application with information such as:
+
+- Company
+- Position
+- Location
+- Application status
+- Job posting URL
+- Job description
+- Notes
+- Follow-up date
+- Interview date
+
+### 🔎 Search
+
+Search applications by:
+
+- Company
+- Job position
+
+### 🎯 Filter
+
+Filter applications by status:
+
+- All
+- Applied
+- Interview
+- Rejected
+- Offer
+
+### ↕️ Sorting
+
+Sort applications by:
+
+- Newest
+- Oldest
+
+### 📄 Job Details
+
+View the complete information associated with an application.
+
+### ✏️ Edit Applications
+
+Update an existing application without losing its associated information.
+
+### 🗑️ Delete Applications
+
+Delete applications with a confirmation dialog to prevent accidental deletion.
+
+### 📭 Empty States
+
+When a search or filter produces no results, JobTrack displays a helpful message instead of showing a blank screen.
+
+---
+
+# 🧭 Application Flow
+
+The current application flow is:
+
+```text
+Welcome
+   │
+   ▼
+Home Dashboard
+   │
+   ├── Search
+   ├── Filter
+   ├── Sort
+   │
+   ├── Add Application
+   │
+   └── Select Application
+            │
+            ▼
+       Job Details
+            │
+       ┌────┴────┐
+       ▼         ▼
+     Edit      Delete
+       │         │
+       ▼         ▼
+   Save Changes  Confirm
 ```
+🔐 Security
 
-## Step 2: Build and run your app
+Sensitive configuration files (node_modules/, .gradle/, local.properties) are excluded via .gitignore. Credentials and secrets should never be committed to source control.
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+📦 Download
 
-### Android
+An installable Android APK will be available in future releases. Until then, run JobTrack directly from source using the local setup guide above.
 
-```sh
-# Using npm
-npm run android
+🌐 Contact & Developer Info
 
-# OR using Yarn
-yarn android
-```
+JobTrack is part of an ongoing software engineering portfolio.
 
-### iOS
+Developer: Abishek Lwagun
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+Website: abisheklwagun.dev
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+Source Code: GitHub Repository
 
-```sh
-bundle install
-```
+JobTrack • Built with React Native & TypeScript
 
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+© 2026 Alogh Organization. All rights reserved.
