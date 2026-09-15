@@ -1,7 +1,7 @@
 
-import { View, Text, StyleSheet, Pressable,ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable,ScrollView,TextInput } from 'react-native';
 import StatCard from '../components/StatCard'
-import {useState}  from 'react';
+import {useMemo, useState}  from 'react';
 import {Job} from '../types/Job';
 import { useNavigation } from '@react-navigation/native';
 import {RootStackParamList} from '../navigation/AppNavigator.tsx';
@@ -15,6 +15,9 @@ function HomeScreen() {
   // const navigation = useNavigation();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [sortOption, setSortOption] = useState('Newest');
 
   const [jobs, setJobs] = useState<Job[]>([
     {
@@ -41,6 +44,39 @@ function HomeScreen() {
     },
   ]);
 
+  // const filteredJobs = useMemo(() => {
+  //   return jobs.filter(job => {
+  //     const matchesSearch = `${job.company} ${job.position}`
+  //       .toLowerCase()
+  //       .includes(searchQuery.toLowerCase());
+  //
+  //     const matchesStatus =
+  //       statusFilter === 'All' || job.status === statusFilter;
+  //
+  //     return matchesSearch && matchesStatus;
+  //   });
+  // }, [jobs, searchQuery, statusFilter]);
+
+  const filteredJobs = useMemo(() => {
+    const filtered = jobs.filter(job => {
+      const matchesSearch = `${job.company} ${job.position}`
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+
+      const matchesStatus =
+        statusFilter === 'All' || job.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+
+    return [...filtered].sort((a, b) => {
+      const dateA = new Date(a.applicationDate).getTime();
+      const dateB = new Date(b.applicationDate).getTime();
+
+      return sortOption === 'Newest' ? dateB - dateA : dateA - dateB;
+    });
+  }, [jobs, searchQuery, statusFilter, sortOption]);
+
   const stats = [
     {
       title: 'Applied',
@@ -66,6 +102,58 @@ function HomeScreen() {
 
   return (
     <ScrollView style={styles.container}>
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search jobs..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
+
+      <View style={styles.filterRow}>
+        {['All', 'Applied', 'Interview', 'Rejected', 'Offer'].map(status => (
+          <Pressable
+            key={status}
+            style={[
+              styles.filterButton,
+              statusFilter === status && styles.filterButtonActive,
+            ]}
+            onPress={() => setStatusFilter(status)}
+          >
+            <Text
+              style={[
+                styles.filterButtonText,
+                statusFilter === status && styles.filterButtonTextActive,
+              ]}
+            >
+              {status}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <View style={styles.sortRow}>
+        <Text style={styles.sortLabel}>Sort:</Text>
+
+        {['Newest', 'Oldest'].map(option => (
+          <Pressable
+            key={option}
+            style={[
+              styles.sortButton,
+              sortOption === option && styles.sortButtonActive,
+            ]}
+            onPress={() => setSortOption(option)}
+          >
+            <Text
+              style={[
+                styles.sortButtonText,
+                sortOption === option && styles.sortButtonTextActive,
+              ]}
+            >
+              {option}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
       <Text style={styles.title}>JobTrack</Text>
 
       <Text style={styles.subtitle}>Your Job Application Dashboard</Text>
@@ -78,9 +166,17 @@ function HomeScreen() {
           <StatCard key={stat.title} title={stat.title} count={stat.count} />
         ))}
       </View>
-      {jobs.map(job => (
-        <Pressable
-          key={job.id}
+      {filteredJobs.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyTitle}>No jobs found</Text>
+          <Text style={styles.emptyText}>
+            Try a different search or filter.
+          </Text>
+        </View>
+      ) : (
+        filteredJobs.map(job => (
+          <Pressable
+            key={job.id}
           style={styles.jobCard}
           onPress={() => {
             navigation.navigate('JobDetails', {
@@ -116,7 +212,8 @@ function HomeScreen() {
             <Text style={styles.status}>{job.status}</Text>
           </View>
         </Pressable>
-      ))}
+      ))
+      )}
 
       {/*<Pressable onPress={() => navigation.navigate('AddJob')}>*/}
       {/*  <Text>Add Job</Text>*/}
@@ -237,6 +334,90 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 17,
     fontWeight: 'bold',
+  },
+  searchInput: {
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    marginBottom: 15,
+  },
+  filterRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 15,
+  },
+
+  filterButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+
+  filterButtonActive: {
+    backgroundColor: '#222020',
+    borderColor: '#222020',
+  },
+
+  filterButtonText: {
+    fontSize: 14,
+  },
+
+  filterButtonTextActive: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  sortRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 15,
+  },
+
+  sortLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+
+  sortButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+
+  sortButtonActive: {
+    backgroundColor: '#222020',
+    borderColor: '#222020',
+  },
+
+  sortButtonText: {
+    fontSize: 14,
+  },
+
+  sortButtonTextActive: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  emptyState: {
+    padding: 30,
+    alignItems: 'center',
+  },
+
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+
+  emptyText: {
+    marginTop: 8,
+    fontSize: 14,
   },
 });
 
