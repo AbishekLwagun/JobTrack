@@ -1,5 +1,5 @@
 export type Job = {
-  id: string;
+  id: number;
   company: string;
   position: string;
   status: 'Applied' | 'Interview' | 'Rejected' | 'Offer';
@@ -8,6 +8,6 @@ export type Job = {
   jobUrl: string;
   jobDescription: string;
   notes: string;
-  followUpDate?: string;
-  interviewDate?: string;
+  followUpDate?: string | null;
+  interviewDate?: string | null;
 };

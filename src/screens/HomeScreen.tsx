@@ -1,11 +1,12 @@
 
 import { View, Text, StyleSheet, Pressable,ScrollView,TextInput } from 'react-native';
 import StatCard from '../components/StatCard'
-import {useMemo, useState}  from 'react';
+import {useMemo, useState, useEffect}  from 'react';
 import {Job} from '../types/Job';
 import { useNavigation } from '@react-navigation/native';
 import {RootStackParamList} from '../navigation/AppNavigator.tsx';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { API_BASE_URL } from '../config/api';
 
 function HomeScreen() {
   // const[applications, setApplications] = useState(11);
@@ -18,44 +19,15 @@ function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [sortOption, setSortOption] = useState('Newest');
+  const [jobs, setJobs] = useState<Job[]>([]);
 
-  const [jobs, setJobs] = useState<Job[]>([
-    {
-      id: '1',
-      company: 'IBM',
-      position: 'Backend Developer Intern',
-      status: 'Applied',
-      applicationDate: '2026-09-14T00:00:00.000Z',
-      location: 'Remote',
-      jobUrl: '',
-      jobDescription: 'Backend software engineering internship.',
-      notes: 'Applied through IBM careers.',
-    },
-    {
-      id: '2',
-      company: 'Tesla',
-      position: 'Software Engineer Intern',
-      status: 'Interview',
-      applicationDate: '2026-09-10T00:00:00.000Z',
-      location: 'Austin, TX',
-      jobUrl: '',
-      jobDescription: 'Software engineering internship opportunity.',
-      notes: 'Interview stage.',
-    },
-  ]);
-
-  // const filteredJobs = useMemo(() => {
-  //   return jobs.filter(job => {
-  //     const matchesSearch = `${job.company} ${job.position}`
-  //       .toLowerCase()
-  //       .includes(searchQuery.toLowerCase());
-  //
-  //     const matchesStatus =
-  //       statusFilter === 'All' || job.status === statusFilter;
-  //
-  //     return matchesSearch && matchesStatus;
-  //   });
-  // }, [jobs, searchQuery, statusFilter]);
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/applications`)
+      .then(response => response.json())
+      .then(data => {
+        setJobs(data);
+      });
+  }, []);
 
   const filteredJobs = useMemo(() => {
     const filtered = jobs.filter(job => {
@@ -79,26 +51,25 @@ function HomeScreen() {
 
   const stats = [
     {
-      title: 'Applied',
-      count: jobs.filter(job => job.status === 'Applied').length,
+      title: 'Applications',
+      count: jobs.length,
     },
     {
       title: 'Interview',
       count: jobs.filter(job => job.status === 'Interview').length,
     },
     {
-      title: 'Rejection',
+      title: 'Rejected',
       count: jobs.filter(job => job.status === 'Rejected').length,
     },
     {
       title: 'Offers',
       count: jobs.filter(job => job.status === 'Offer').length,
-    }
+    },
     // { title: 'Interview', count: interviews },
     // { title: 'Rejected', count: rejections },
     // { title: 'Offer', count: offers },
   ];
-
 
   return (
     <ScrollView style={styles.container}>
@@ -158,10 +129,7 @@ function HomeScreen() {
 
       <Text style={styles.subtitle}>Your Job Application Dashboard</Text>
       <View style={styles.stateContainer}>
-        {/*<StatCard title="Applications" count={11} />*/}
-        {/*<StatCard title="Interview" count={5} />*/}
-        {/*<StatCard title="Rejected" count={6} />*/}
-        {/*<StatCard title="Offer" count={3} />*/}
+
         {stats.map(stat => (
           <StatCard key={stat.title} title={stat.title} count={stat.count} />
         ))}
@@ -177,42 +145,50 @@ function HomeScreen() {
         filteredJobs.map(job => (
           <Pressable
             key={job.id}
-          style={styles.jobCard}
-          onPress={() => {
-            navigation.navigate('JobDetails', {
-              job: job,
+            style={styles.jobCard}
+            onPress={() => {
+              navigation.navigate('JobDetails', {
+                job: job,
 
-              onSave: updatedJob => {
-                setJobs(currentJobs =>
-                  currentJobs.map(currentJob =>
-                    currentJob.id === updatedJob.id ? updatedJob : currentJob,
-                  ),
-                );
-              },
+                onSave: updatedJob => {
+                  setJobs(currentJobs =>
+                    currentJobs.map(currentJob =>
+                      currentJob.id === updatedJob.id ? updatedJob : currentJob,
+                    ),
+                  );
+                },
 
-              onDelete: jobId => {
-                setJobs(currentJobs =>
-                  currentJobs.filter(currentJob => currentJob.id !== jobId),
-                );
-              },
-            });
-          }}
-        >
-          <Text style={styles.company}>{job.company}</Text>
-          <Text style={styles.position}>{job.position}</Text>
-          <View
-            style={[
-              styles.statusBadge,
-              job.status === 'Applied' && styles.appliedBadge,
-              job.status === 'Interview' && styles.interviewBadge,
-              job.status === 'Rejected' && styles.rejectedBadge,
-              job.status === 'Offer' && styles.offerBadge,
-            ]}
+                onDelete: (jobId: number) => {
+                  fetch(`${API_BASE_URL}/applications/${jobId}`, {
+                    method: 'DELETE',
+                  }).then(response => {
+                    if (response.ok) {
+                      setJobs((currentJobs: Job[]) =>
+                        currentJobs.filter(
+                          (currentJob: Job) => currentJob.id !== jobId,
+                        ),
+                      );
+                    }
+                  });
+                },
+              });
+            }}
           >
-            <Text style={styles.status}>{job.status}</Text>
-          </View>
-        </Pressable>
-      ))
+            <Text style={styles.company}>{job.company}</Text>
+            <Text style={styles.position}>{job.position}</Text>
+            <View
+              style={[
+                styles.statusBadge,
+                job.status === 'Applied' && styles.appliedBadge,
+                job.status === 'Interview' && styles.interviewBadge,
+                job.status === 'Rejected' && styles.rejectedBadge,
+                job.status === 'Offer' && styles.offerBadge,
+              ]}
+            >
+              <Text style={styles.status}>{job.status}</Text>
+            </View>
+          </Pressable>
+        ))
       )}
 
       {/*<Pressable onPress={() => navigation.navigate('AddJob')}>*/}

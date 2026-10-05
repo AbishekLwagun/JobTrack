@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Linking, Pressable,Alert } from 'react-native';
+import { View, Text, StyleSheet, Linking, Pressable,Alert, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -12,7 +12,7 @@ function JobDetailsScreen({ route }: any) {
   const [currentJob, setCurrentJob] = useState(job);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>Job Details</Text>
 
       <View style={styles.card}>
@@ -29,11 +29,13 @@ function JobDetailsScreen({ route }: any) {
         <Text style={styles.label}>Application Date</Text>
 
         <Text style={styles.date}>
-          {new Date(currentJob.applicationDate).toLocaleDateString('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
-          })}
+          {currentJob.applicationDate
+            ? new Date(currentJob.applicationDate).toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              })
+            : 'Not available'}
         </Text>
 
         <Text style={styles.label}>Location</Text>
@@ -114,7 +116,7 @@ function JobDetailsScreen({ route }: any) {
       >
         <Text style={styles.deleteButtonText}>Delete Application</Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -206,6 +208,7 @@ const styles = StyleSheet.create({
   deleteButton: {
     marginTop: 12,
     padding: 15,
+    marginBottom:100,
     borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,

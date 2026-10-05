@@ -17,7 +17,7 @@ export type RootStackParamList = {
   JobDetails: {
     job: Job;
     onSave: (job: Job) => void;
-    onDelete: (jobId: string) => void;
+    onDelete: (jobId: number) => void;
   };
   EditJob: {
     job: Job;

@@ -1,6 +1,8 @@
 import {StyleSheet, View, Text, TextInput, Pressable, Animated, ScrollView} from 'react-native';
 import { useRef,useState } from 'react';
 import { Job } from '../types/Job';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { API_BASE_URL } from '../config/api';
 
 function AddJobScreen({ route }: any) {
   const [company, setCompany] = useState('');
@@ -11,6 +13,8 @@ function AddJobScreen({ route }: any) {
   const [jobUrl, setJobUrl] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [notes, setNotes] = useState('');
+  const [showFollowUpPicker, setShowFollowUpPicker] = useState(false);
+  const [showInterviewPicker, setShowInterviewPicker] = useState(false);
   const [followUpDate, setFollowUpDate] = useState('');
   const [interviewDate, setInterviewDate] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -36,49 +40,71 @@ function AddJobScreen({ route }: any) {
     }
     setErrorMessage('');
 
-    const newJob: Job = {
-      id: String(Date.now()),
+    const newJob = {
       company,
       position,
       status,
-      applicationDate: new Date().toISOString(),
+      applicationDate: new Date().toISOString().split('T')[0],
       location,
       jobUrl,
       jobDescription,
       notes,
-      followUpDate: followUpDate || undefined,
-      interviewDate: interviewDate || undefined,
+      followUpDate: followUpDate || null,
+      interviewDate: interviewDate || null,
     };
+
+    fetch(`${API_BASE_URL}/applications`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newJob),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to save application');
+        }
+
+        return response.json();
+      })
+      .then(data => {
+        console.log('Saved from backend:', data);
+        route.params?.onSave(data);
+        Animated.sequence([
+          Animated.timing(successOpacity, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+
+          Animated.delay(1000),
+
+          Animated.timing(successOpacity, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+        ]).start(() => {
+          setCompany('');
+          setPosition('');
+          setStatus('Applied');
+          setLocation('');
+          setJobUrl('');
+          setJobDescription('');
+          setNotes('');
+          setFollowUpDate('');
+          setInterviewDate('');
+        });
+      })
+      .catch(error => {
+        console.error('Error saving application:', error);
+        setErrorMessage('Could not save application. Please try again.');
+      });
 
     console.log('Saving job:', newJob);
 
-    route.params?.onSave(newJob);
 
-    Animated.sequence([
-      Animated.timing(successOpacity, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
 
-      Animated.delay(1000),
-
-      Animated.timing(successOpacity, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setCompany('');
-      setPosition('');
-      setStatus('Applied');
-      setLocation('');
-      setJobUrl('');
-      setJobDescription('');
-      setNotes('');
-      setFollowUpDate('');
-      setInterviewDate('');
-    });
   };
 
   return (
@@ -149,20 +175,52 @@ function AddJobScreen({ route }: any) {
       />
 
       <Text style={styles.label}>Follow-up Date</Text>
-      <TextInput
+
+      <Pressable
         style={styles.input}
-        placeholder="e.g. September 20, 2026"
-        value={followUpDate}
-        onChangeText={setFollowUpDate}
-      />
+        onPress={() => setShowFollowUpPicker(true)}
+      >
+        <Text>{followUpDate || 'Select Date'}</Text>
+      </Pressable>
+
+      {showFollowUpPicker && (
+        <DateTimePicker
+          value={new Date()}
+          mode="date"
+          onChange={(_event, selectedDate) => {
+            setShowFollowUpPicker(false);
+
+            if (selectedDate) {
+              const formattedDate = selectedDate.toISOString().split('T')[0];
+              setFollowUpDate(formattedDate);
+            }
+          }}
+        />
+      )}
 
       <Text style={styles.label}>Interview Date</Text>
-      <TextInput
+
+      <Pressable
         style={styles.input}
-        placeholder="e.g. September 25, 2026"
-        value={interviewDate}
-        onChangeText={setInterviewDate}
-      />
+        onPress={() => setShowInterviewPicker(true)}
+      >
+        <Text>{interviewDate || 'Select Date'}</Text>
+      </Pressable>
+
+      {showInterviewPicker && (
+        <DateTimePicker
+          value={new Date()}
+          mode="date"
+          onChange={(_event, selectedDate) => {
+            setShowInterviewPicker(false);
+
+            if (selectedDate) {
+              const formattedDate = selectedDate.toISOString().split('T')[0];
+              setInterviewDate(formattedDate);
+            }
+          }}
+        />
+      )}
 
       <Text style={styles.label}>Status</Text>
 

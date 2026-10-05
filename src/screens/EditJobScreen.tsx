@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { API_BASE_URL } from '../config/api';
+
 import {
   View,
   Text,
@@ -27,6 +30,11 @@ function EditJobScreen({ route }: any) {
   const [interviewDate, setInterviewDate] = useState(job.interviewDate ?? '');
   const [status, setStatus] = useState<Job['status']>(job.status);
   const [successMessage, setSuccessMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+
+  const [showFollowUpPicker, setShowFollowUpPicker] = useState(false);
+  const [showInterviewPicker, setShowInterviewPicker] = useState(false);
 
   return (
     <ScrollView
@@ -86,21 +94,49 @@ function EditJobScreen({ route }: any) {
         multiline
       />
 
-      <Text style={styles.label}>Follow-up Date</Text>
-      <TextInput
+      <Pressable
         style={styles.input}
-        value={followUpDate}
-        onChangeText={setFollowUpDate}
-        placeholder="e.g. September 20, 2026"
-      />
+        onPress={() => setShowFollowUpPicker(true)}
+      >
+        <Text>{followUpDate || 'Select Date'}</Text>
+      </Pressable>
 
-      <Text style={styles.label}>Interview Date</Text>
-      <TextInput
+      {showFollowUpPicker && (
+        <DateTimePicker
+          value={followUpDate ? new Date(followUpDate) : new Date()}
+          mode="date"
+          onChange={(_event, selectedDate) => {
+            setShowFollowUpPicker(false);
+
+            if (selectedDate) {
+              const formattedDate = selectedDate.toISOString().split('T')[0];
+              setFollowUpDate(formattedDate);
+            }
+          }}
+        />
+      )}
+
+      <Pressable
         style={styles.input}
-        value={interviewDate}
-        onChangeText={setInterviewDate}
-        placeholder="e.g. September 25, 2026"
-      />
+        onPress={() => setShowInterviewPicker(true)}
+      >
+        <Text>{interviewDate || 'Select Date'}</Text>
+      </Pressable>
+
+      {showInterviewPicker && (
+        <DateTimePicker
+          value={interviewDate ? new Date(interviewDate) : new Date()}
+          mode="date"
+          onChange={(_event, selectedDate) => {
+            setShowInterviewPicker(false);
+
+            if (selectedDate) {
+              const formattedDate = selectedDate.toISOString().split('T')[0];
+              setInterviewDate(formattedDate);
+            }
+          }}
+        />
+      )}
 
       <Text style={styles.label}>Status</Text>
 
@@ -150,6 +186,11 @@ function EditJobScreen({ route }: any) {
           <Text style={styles.successText}>✓ Application updated!</Text>
         </View>
       ) : null}
+
+      {errorMessage ? (
+        <Text style={styles.errorText}>{errorMessage}</Text>
+      ) : null}
+
       <Pressable
         style={styles.saveButton}
         onPress={() => {
@@ -161,17 +202,42 @@ function EditJobScreen({ route }: any) {
             jobUrl,
             jobDescription,
             notes,
-            followUpDate: followUpDate || undefined,
-            interviewDate: interviewDate || undefined,
+            followUpDate: followUpDate || null,
+            interviewDate: interviewDate || null,
             status,
           };
 
-          route.params.onSave(updatedJob);
-          setSuccessMessage(true);
+          console.log('UPDATED JOB:', updatedJob);
+          fetch(`${API_BASE_URL}/applications/${job.id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedJob),
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to update application');
+              }
 
-          setTimeout(() => {
-            navigation.goBack();
-          }, 1500);
+              return response.json();
+            })
+            .then(data => {
+              route.params.onSave(data);
+              setErrorMessage('');
+              setSuccessMessage(true);
+
+              setTimeout(() => {
+                navigation.goBack();
+              }, 1500);
+            })
+            .catch(error => {
+              console.error('Error updating application:', error);
+              setSuccessMessage(false);
+              setErrorMessage(
+                'Could not update application. Please try again.',
+              );
+            });
         }}
       >
         <Text style={styles.saveButtonText}>Save Changes</Text>
@@ -264,6 +330,12 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  errorText: {
+    color: '#D32F2F',
+    fontSize: 14,
+    marginTop: 10,
+    textAlign: 'center',
   },
 });
 
