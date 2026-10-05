@@ -10,21 +10,44 @@ JobTrack started from a problem I personally experienced while applying for soft
 Instead of managing that information across notes, spreadsheets, emails, and browser tabs, I built **JobTrack** as a centralized mobile job-search dashboard.
 
 ---
-
 ## 📱 App Preview
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/2367c0b2-13f0-412c-854c-0e3fc1931306" width="260" alt="JobTrack dashboard" />
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/user-attachments/assets/4d7166ca-b1fc-46d6-b61f-e73ceddcf23d" width="260" alt="JobTrack application screen" />
+  <code>Welcome Screen</code>
+</p>
+
+<p align="center">
+  <img src="docs/images/welcome.png" width="300" alt="JobTrack Welcome Screen" />
 </p>
 
 <br>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/1fb20a13-318c-42bd-8980-afaba21b625d" width="260" alt="JobTrack application details" />
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/user-attachments/assets/67eeb7a8-d3a9-4390-9a8c-3f6accff8e15" width="260" alt="JobTrack application form" />
+  <code>Home Dashboard</code>
+</p>
+
+<p align="center">
+  <img src="docs/images/home.png" width="300" alt="JobTrack Home Dashboard" />
+</p>
+
+<br>
+
+<p align="center">
+  <code>Add Application</code>
+</p>
+
+<p align="center">
+  <img src="docs/images/post.png" width="300" alt="JobTrack Add Application Screen" />
+</p>
+
+<br>
+
+<p align="center">
+  <code>Edit Application</code>
+</p>
+
+<p align="center">
+  <img src="docs/images/update.png" width="300" alt="JobTrack Edit Application Screen" />
 </p>
 
 ---
